@@ -9,9 +9,17 @@ use core::panic::PanicInfo;
 /// Function never returns, because who should catch that? Instead we may shut down the computer or something.
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    loop {
+    let text = b"Hello World";
+    let vga_buffer = 0xb8000 as *mut u8;
 
+    for (i, &byte) in text.into_iter().enumerate() {
+        unsafe {
+            *vga_buffer.offset(i as isize * 2) = byte;
+            *vga_buffer.offset(i as isize * 2 + 1) = 0xb;
+        }
     }
+
+    loop {}
 }
 
 /// This function is called when a panic occurs. It never returns.
