@@ -18,7 +18,7 @@ lazy_static! {
 /// Print something to the vga_buffer.
 #[macro_export]
 macro_rules! print {
-    ($($arg:tt)*) => ($crate::vga_buffer::_print(format_args!($($arg)*)));
+    ($($arg:tt)*) => ($crate::vga::_print(format_args!($($arg)*)));
 }
 
 /// Print something to the vga_buffer and include a newline.
@@ -144,8 +144,7 @@ impl Writer {
                     ascii_value: byte,
                     color_code: self.color_code,
                 };
-                let y = BUFFER_HEIGHT - 1;
-                let x = self.cursor_position.x;
+                let CursorPosition { y, x } = self.cursor_position;
                 self.buffer[y][x].write(screen_char);
                 self.cursor_position.x += 1;
             }
@@ -155,13 +154,19 @@ impl Writer {
     /// Adds a newline to the vga buffer. This is done by copying all lines one line up, which discards the topmost
     /// line. The bottommost line is cleared and the cursor performs a carriage return.
     fn new_line(&mut self) {
-        for y in 1..BUFFER_HEIGHT {
-            for x in 0..BUFFER_WIDTH {
-                // Copy each char one line up
-                let character = self.buffer[y][x].read();
-                self.buffer[y-1][x].write(character)
+        if self.cursor_position.y == BUFFER_HEIGHT-1 {
+            // Screen is full. Copy each char one line up
+            for y in 1..BUFFER_HEIGHT {
+                for x in 0..BUFFER_WIDTH {
+                    let character = self.buffer[y][x].read();
+                    self.buffer[y-1][x].write(character)
+                }
             }
+        } else {
+            // Screen is not full yet. Write one line below
+            self.cursor_position.y += 1;
         }
+
         self.clear_row(BUFFER_HEIGHT-1);
         self.carriage_return();
     }

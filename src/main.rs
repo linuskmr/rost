@@ -9,7 +9,7 @@ use core::panic::PanicInfo;
 use crate::vga::{Color, ColorCode, Writer};
 
 fn main() {
-    println!("Hallo wie gehts?\nWar ja nur eine Frage... {}", 42);
+    println!("Main function");
 }
 
 /// Entry point for this binary.
