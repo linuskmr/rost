@@ -1,0 +1,22 @@
+# Linker arguments for various platforms
+# All have in common that no libc should be linked
+
+[target.'cfg(target_os = "linux")']
+rustflags = ["-C", "link-arg=-nostartfiles"]
+
+[target.'cfg(target_os = "windows")']
+rustflags = ["-C", "link-args=/ENTRY:_start /SUBSYSTEM:console"]
+
+[target.'cfg(target_os = "macos")']
+rustflags = ["-C", "link-args=-e __start -static -nostartfiles"]
+
+[unstable]
+# Enable memory-related functions (memset, memcpy, memcmp, ...) from compiler-builtins-mem instead of the implementation
+# from the libc of the os.
+build-std-features = ["compiler-builtins-mem"]
+# Recompile core and compiler_builtins library for rost's target triple
+build-std = ["core", "compiler_builtins"]
+
+[build]
+# Default build for rost's targt triple
+target = "x86_64_rost.json"
