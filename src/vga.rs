@@ -1,7 +1,7 @@
 //! Utilities for printing to the vga buffer.
-use core::{fmt, ptr};
+use core::{fmt};
 use core::fmt::Write;
-use core::mem::size_of;
+
 use volatile::Volatile;
 use lazy_static::lazy_static;
 use spin::Mutex;
